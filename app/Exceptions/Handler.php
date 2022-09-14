@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\JsonResponse;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -41,10 +42,29 @@ class Handler extends ExceptionHandler
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
-        $this->reportable(function (Throwable $e) {
-            //
+        $this->renderable(function (Throwable $e) {
+            if ($e->getCode() > 200 && $e->getCode() < 500) {
+                return $this->sendResponse($e->getMessage(), $e->getCode());
+            }
+
+            return $this->sendResponse("Erro interno do servidor", 500);
         });
+    }
+
+    /**
+     * Método responsável por retornar a resposta para o cliente.
+     *
+     * @param mixed $content
+     * @param int $code
+     *
+     * @return JsonResponse
+     */
+    protected function sendResponse(mixed $content, int $code): JsonResponse
+    {
+        return response()->json([
+            "message" => $content
+        ])->setStatusCode($code);
     }
 }
