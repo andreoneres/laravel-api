@@ -45,7 +45,7 @@ class Handler extends ExceptionHandler
     public function register(): void
     {
         $this->renderable(function (Throwable $e) {
-            if ($e->getCode() > 200 && $e->getCode() < 500) {
+            if ($e->getCode() > 200 && $e->getCode() < 600) {
                 return $this->sendResponse($e->getMessage(), $e->getCode());
             }
 
@@ -64,7 +64,7 @@ class Handler extends ExceptionHandler
     protected function sendResponse(mixed $content, int $code): JsonResponse
     {
         return response()->json([
-            "message" => $content
+            "error" => $content
         ])->setStatusCode($code);
     }
 }
