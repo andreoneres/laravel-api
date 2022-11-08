@@ -4,90 +4,43 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\User\CreateRequest;
+use App\Http\Requests\User\UpdateRequest;
 use App\Models\User;
-use App\Repositories\UserRepository;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
 use Exception;
-use Illuminate\Support\Facades\Validator;
 use Throwable;
 
 class UserController
 {
     /**
-     * Repositório de usuários.
+     * Instância do modelo de usuários.
      */
-    private UserRepository $repository;
+    private User $user;
 
-    public function __construct(UserRepository $repository)
+    public function __construct(User $user)
     {
-        $this->repository = $repository;
+        $this->user = $user;
     }
 
     /**
      * Método responsável por criar um novo usuário.
-     * @throws Exception
      */
-    public function create(Request $request): Model
+    public function create(CreateRequest $request): User
     {
-        $postVars = $request->all();
-
-        $validator = Validator::make($postVars, [
-            "name" => "required|string|max:255",
-            "lastname" => "required|string|max:255",
-            "age" => "required|integer",
-            "gender" => "required|string|max:1",
-            "email" => "required|string|email|max:255",
-            "password" => "required|string|min:8",
-        ]);
-
-        if ($validator->fails()) {
-            throw new Exception($validator->errors()->first(), 400);
-        }
-
-        $user = new User();
-
-        $user->name = $postVars["name"];
-        $user->lastname = $postVars["lastname"];
-        $user->age = $postVars["age"];
-        $user->gender = $postVars["gender"];
-        $user->email = $postVars["email"];
-        $user->password = $postVars["password"];
-
-        return $this->repository->create($user);
+        return $this->user->create($request->validated());
     }
 
     /**
      * Método responsável por criar um novo usuário.
      * @throws Throwable
      */
-    public function update(Request $request, int $userId): Model
+    public function update(UpdateRequest $request, int $userId): User
     {
-        $postVars = $request->all();
+        $data = $request->validated();
 
-        $validator = Validator::make($postVars, [
-            "name" => "required|string|max:255",
-            "lastname" => "required|string|max:255",
-            "age" => "required|integer",
-            "gender" => "required|string|max:1",
-            "email" => "required|string|email|max:255",
-            "password" => "required|string|min:8",
-        ]);
+        $user = $this->findOne($userId);
 
-        if ($validator->fails()) {
-            throw new Exception($validator->errors()->first(), 400);
-        }
-
-        $user = $this->repository->findOne($userId);
-
-        $user->name = $postVars["name"];
-        $user->lastname = $postVars["lastname"];
-        $user->age = $postVars["age"];
-        $user->gender = $postVars["gender"];
-        $user->email = $postVars["email"];
-        $user->password = $postVars["password"];
-
-        $this->repository->update($user);
+        $user->update($data);
 
         return $user;
     }
@@ -96,12 +49,12 @@ class UserController
      * Método responsável por retornar um usuário pelo ID.
      * @throws Exception
      */
-    public function findOne(int $userId): Model
+    public function findOne(int $userId): User
     {
-        $user = $this->repository->findOne($userId);
+        $user = $this->user->query()->find($userId);
 
         if (!$user)
-            throw new Exception("Usuário não foi encontrado", 404);
+            throw new Exception("User not found", 404);
 
         return $user;
     }
@@ -111,6 +64,6 @@ class UserController
      */
     public function findAll(): \Illuminate\Pagination\LengthAwarePaginator
     {
-        return $this->repository->paginate(["name" => "André"]);
+        return $this->user->query()->paginate(10);
     }
 }
