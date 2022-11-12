@@ -8,6 +8,7 @@ use App\Http\Requests\User\CreateRequest;
 use App\Http\Requests\User\UpdateRequest;
 use App\Models\User;
 use Exception;
+use Illuminate\Support\Facades\Hash;
 use Throwable;
 
 class UserController
@@ -27,7 +28,11 @@ class UserController
      */
     public function create(CreateRequest $request): User
     {
-        return $this->user->create($request->validated());
+        $data = $request->validated();
+
+        $data["password"] = Hash::make($data["password"]);
+
+        return $this->user->create($data);
     }
 
     /**
@@ -39,6 +44,8 @@ class UserController
         $data = $request->validated();
 
         $user = $this->findOne($userId);
+
+        $data["password"] = Hash::make($data["password"]);
 
         $user->update($data);
 
