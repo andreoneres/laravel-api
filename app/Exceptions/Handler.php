@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -49,7 +50,11 @@ class Handler extends ExceptionHandler
                 return $this->sendResponse($e->getMessage(), $e->getCode());
             }
 
-            return $this->sendResponse("Erro interno do servidor", 500);
+            if ($e instanceof ValidationException) {
+                return $this->sendResponse($e->getMessage(), 400);
+            }
+
+           return $this->sendResponse("Erro interno do servidor", 500);
         });
     }
 
