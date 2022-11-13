@@ -20,7 +20,7 @@ class CreateRequest extends FormRequest
             "lastname" => "required|string|max:255",
             "age"      => "required|integer",
             "gender"   => "required|string|in:M,F",
-            "email"    => "required|string|email|max:100",
+            "email"    => "required|email|max:100|unique:users,email",
             "password" => "required|string|min:8",
         ];
     }
