@@ -21,7 +21,7 @@ Route::controller(UserController::class)
     ->middleware("auth:api")
     ->group(function () {
         Route::post("users", "create");
-        Route::put("users/{id}", "update");
+        Route::patch("users/{id}", "update");
         Route::get("users/{id}", "findOne");
         Route::get("users", "findAll");
 });

@@ -20,7 +20,6 @@ class UpdateRequest extends FormRequest
             "lastname" => "required|string|max:255",
             "age"      => "required|integer",
             "gender"   => "required|string|in:M,F",
-            "email"    => "required|string|email|max:100",
             "password" => "required|string|min:8",
         ];
     }
